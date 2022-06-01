@@ -1,0 +1,1 @@
+按照描述将string转化为golang中常用类型，比如可以应用在 非结构化的dto to golang value 的场景
