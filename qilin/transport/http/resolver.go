@@ -1,4 +1,4 @@
-package storage
+package http
 
 import (
 	"net/url"
@@ -7,9 +7,10 @@ import (
 
 // Target is resolver target
 type Target struct {
-	Scheme    string
-	Authority string
-	Endpoint  string
+	Scheme string
+	// host or host:port
+	Host     string
+	Endpoint string
 }
 
 func parseTarget(endpoint string, insecure bool) (*Target, error) {
@@ -24,7 +25,7 @@ func parseTarget(endpoint string, insecure bool) (*Target, error) {
 	if err != nil {
 		return nil, err
 	}
-	target := &Target{Scheme: u.Scheme, Authority: u.Host}
+	target := &Target{Scheme: u.Scheme, Host: u.Host}
 	if len(u.Path) > 1 {
 		target.Endpoint = u.Path[1:]
 	}

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/go-kratos/kratos/v2/transport"
 	"github.com/stretchr/testify/assert"
+	"github.com/yuhu-tech/qilin-sdk-go/qilin/transport"
 )
 
 func TestTransport_Kind(t *testing.T) {

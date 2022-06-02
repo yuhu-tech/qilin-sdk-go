@@ -1,4 +1,4 @@
-package storage
+package http
 
 import (
 	"net/http"
@@ -25,7 +25,7 @@ func TestContentTypeCallOption_before(t *testing.T) {
 
 func TestDefaultCallInfo(t *testing.T) {
 	path := "hi"
-	rv := DefaultCallInfo(path)
+	rv := defaultCallInfo(path)
 	assert.Equal(t, path, rv.pathTemplate)
 	assert.Equal(t, path, rv.operation)
 	assert.Equal(t, "application/json", rv.contentType)

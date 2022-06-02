@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	httpstatus "github.com/yuhu-tech/qilin-sdk-go/gerr/status"
+	httpstatus "github.com/yuhu-tech/qilin-sdk-go/qilin/gerr/status"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/status"

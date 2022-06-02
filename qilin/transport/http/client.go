@@ -4,18 +4,22 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"time"
 
 	"github.com/yuhu-tech/qilin-sdk-go/internal/encoding"
-	errors "github.com/yuhu-tech/qilin-sdk-go/internal/gerr"
 	"github.com/yuhu-tech/qilin-sdk-go/internal/httputil"
+	"github.com/yuhu-tech/qilin-sdk-go/qilin/gerr"
 	"github.com/yuhu-tech/qilin-sdk-go/qilin/middleware"
 	"github.com/yuhu-tech/qilin-sdk-go/qilin/transport"
-	qhttp "github.com/yuhu-tech/qilin-sdk-go/qilin/transport/http"
 )
+
+type FormDataParser interface {
+	ParseFormData() (io.Reader, string, error)
+}
 
 // DecodeErrorFunc is decode error func.
 type DecodeErrorFunc func(ctx context.Context, res *http.Response) error
@@ -41,13 +45,28 @@ type clientOptions struct {
 	errorDecoder DecodeErrorFunc
 	transport    http.RoundTripper
 	middleware   []middleware.Middleware
-	block        bool
+	auth         *Authenticator
+	region       string
+	// Retryer
+	block bool
 }
 
 // WithTransport with client transport.
 func WithTransport(trans http.RoundTripper) ClientOption {
 	return func(o *clientOptions) {
 		o.transport = trans
+	}
+}
+
+func WithAuth(auth *Authenticator) ClientOption {
+	return func(co *clientOptions) {
+		co.auth = auth
+	}
+}
+
+func WithRegion(region string) ClientOption {
+	return func(co *clientOptions) {
+		co.region = region
 	}
 }
 
@@ -126,11 +145,12 @@ type Client struct {
 func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
 	options := clientOptions{
 		ctx:          ctx,
-		timeout:      2000 * time.Millisecond,
+		timeout:      2 * time.Second,
 		encoder:      DefaultRequestEncoder,
 		decoder:      DefaultResponseDecoder,
 		errorDecoder: DefaultErrorDecoder,
 		transport:    http.DefaultTransport,
+		region:       DefaultRegion,
 	}
 	for _, o := range opts {
 		o(&options)
@@ -157,12 +177,13 @@ func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
 	}, nil
 }
 
-// TODO 支持 multi-form
 // Invoke makes an rpc call procedure for remote service.
 func (client *Client) Invoke(ctx context.Context, method, path string, args interface{}, reply interface{}, opts ...CallOption) error {
+	// 参数处理
 	var (
 		contentType string
 		body        io.Reader
+		err         error
 	)
 	c := defaultCallInfo(path)
 	for _, o := range opts {
@@ -171,25 +192,52 @@ func (client *Client) Invoke(ctx context.Context, method, path string, args inte
 		}
 	}
 	if args != nil {
-		data, err := client.opts.encoder(ctx, c.contentType, args)
-		if err != nil {
-			return err
+		// 如果是一个 FormDataParser，则按照 form-data 解析数据
+		if parser, ok := args.(FormDataParser); ok {
+			if !ok {
+				return errors.New("args need impl the interface FormDataParser")
+			}
+			body, contentType, err = parser.ParseFormData()
+			if err != nil {
+				return err
+			}
+		} else {
+			// TODO form-data 合并到 encoder，encoder 返回 io.reader
+			data, err := client.opts.encoder(ctx, c.contentType, args)
+			if err != nil {
+				return err
+			}
+			body = bytes.NewReader(data)
+			contentType = c.contentType
 		}
-		contentType = c.contentType
-		body = bytes.NewReader(data)
 	}
-	url := fmt.Sprintf("%s://%s%s", client.target.Scheme, client.target.Authority, path)
+
+	url := fmt.Sprintf("%s://%s%s", client.target.Scheme, client.target.Host, path)
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return err
 	}
+	// 认证
+	if client.opts.auth != nil {
+		pMaker, ok := args.(PayloadMaker)
+		if !ok {
+			return errors.New("'PayloadMaker' Interface Must be implemented when authentication is required")
+		}
+		hs, err := client.opts.auth.GenerateAuthHeader(client.opts.region, pMaker.Payload(), c.operation)
+		if err != nil {
+			return err
+		}
+		for k, v := range hs {
+			req.Header.Set(k, v)
+		}
+	}
 	if contentType != "" {
-		req.Header.Set("Content-Type", c.contentType)
+		req.Header.Set("Content-Type", contentType)
 	}
 	if client.opts.userAgent != "" {
 		req.Header.Set("User-Agent", client.opts.userAgent)
 	}
-	ctx = transport.NewClientContext(ctx, &qhttp.Transport{
+	ctx = transport.NewClientContext(ctx, &Transport{
 		endpoint:     client.opts.endpoint,
 		reqHeader:    headerCarrier(req.Header),
 		operation:    c.operation,
@@ -251,11 +299,12 @@ func (client *Client) do(req *http.Request) (*http.Response, error) {
 
 // Close tears down the Transport and all underlying connections.
 func (client *Client) Close() error {
-	if client.r != nil {
-		return client.r.Close()
-	}
 	return nil
 }
+
+const (
+	DefaultRegion = "cn-shanghai-1"
+)
 
 // DefaultRequestEncoder is an HTTP request encoder.
 func DefaultRequestEncoder(ctx context.Context, contentType string, in interface{}) ([]byte, error) {
@@ -274,6 +323,9 @@ func DefaultResponseDecoder(ctx context.Context, res *http.Response, v interface
 	if err != nil {
 		return err
 	}
+	if len(data) == 0 {
+		return nil
+	}
 	return CodecForResponse(res).Unmarshal(data, v)
 }
 
@@ -285,13 +337,13 @@ func DefaultErrorDecoder(ctx context.Context, res *http.Response) error {
 	defer res.Body.Close()
 	data, err := io.ReadAll(res.Body)
 	if err == nil {
-		e := new(errors.Error)
+		e := new(gerr.Error)
 		if err = CodecForResponse(res).Unmarshal(data, e); err == nil {
 			e.Code = int32(res.StatusCode)
 			return e
 		}
 	}
-	return errors.Errorf(res.StatusCode, errors.UnknownReason, err.Error())
+	return gerr.Newf(res.StatusCode, gerr.UnknownReason, err.Error())
 }
 
 // CodecForResponse get encoding.Codec via http.Response

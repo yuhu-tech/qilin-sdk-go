@@ -1,73 +1,47 @@
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX - License - Identifier: Apache - 2.0
 package main
 
 import (
 	"context"
-	"flag"
-	"fmt"
+	"log"
 	"os"
 
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/yuhu-tech/qilin-sdk-go/service/storage"
 )
 
-// S3PutObjectAPI defines the interface for the PutObject function.
-// We use this interface to test the function using a mocked service.
-type S3PutObjectAPI interface {
-	PutObject(ctx context.Context,
-		params *s3.PutObjectInput,
-		optFns ...func(*s3.Options)) (*s3.PutObjectOutput, error)
-}
-
-// PutFile uploads a file to an Amazon Simple Storage Service (Amazon S3) bucket
-// Inputs:
-//     c is the context of the method call, which includes the AWS Region
-//     api is the interface that defines the method call
-//     input defines the input arguments to the service call.
-// Output:
-//     If success, a PutObjectOutput object containing the result of the service call and nil
-//     Otherwise, nil and an error from the call to PutObject
-func PutFile(c context.Context, api S3PutObjectAPI, input *s3.PutObjectInput) (*s3.PutObjectOutput, error) {
-	return api.PutObject(c, input)
-}
+const (
+	TestTenant = "tid-yuhu1"
+	Ak         = "test-ak"
+	Sk         = "test-sk"
+	// dev endpoint
+	Endpoint = "localhost:10000"
+)
 
 func main() {
-	bucket := flag.String("b", "", "The bucket to upload the file to")
-	filename := flag.String("f", "", "The file to upload")
-	flag.Parse()
-
-	if *bucket == "" || *filename == "" {
-		fmt.Println("You must supply a bucket name (-b BUCKET) and file name (-f FILE)")
-		return
-	}
-
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+	// init client
+	cli, err := storage.NewClient(context.Background(), &storage.Config{AK: Ak, SK: Sk, Endpoint: Endpoint})
 	if err != nil {
-		panic("configuration error, " + err.Error())
+		log.Fatal(err)
 	}
 
-	client := s3.NewFromConfig(cfg)
-
-	file, err := os.Open(*filename)
-
+	// upload files
+	file1, err := os.Open("./1.jpg")
 	if err != nil {
-		fmt.Println("Unable to open file " + *filename)
-		return
+		log.Fatal(err)
 	}
+	defer file1.Close()
+	// file2Name, file2 := "file2", bytes.NewReader([]byte("file2-stream"))
 
-	defer file.Close()
-
-	input := &s3.PutObjectInput{
-		Bucket: bucket,
-		Key:    filename,
-		Body:   file,
-	}
-
-	_, err = PutFile(context.TODO(), client, input)
+	input, err := storage.NewUploadFilesInput(
+		TestTenant,
+		[]storage.Files{
+			{FileName: "0.jpg", Data: file1},
+			// {FileName: file2Name, Data: file2},
+		})
 	if err != nil {
-		fmt.Println("Got error uploading file:")
-		fmt.Println(err)
-		return
+		log.Fatal(err)
+	}
+	_, err = cli.UploadFiles(context.Background(), input)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
