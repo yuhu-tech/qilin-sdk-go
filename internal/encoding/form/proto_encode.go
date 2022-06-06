@@ -6,9 +6,7 @@ import (
 	"net/url"
 	"reflect"
 	"strconv"
-	"strings"
 
-	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -34,7 +32,9 @@ func encodeByField(u url.Values, path string, v protoreflect.Message) error {
 		if fd.HasJSONName() {
 			key = fd.JSONName()
 		} else {
-			key = fd.TextName()
+			// key = fd.TextName()
+			// TODO
+			key = fd.JSONName()
 		}
 		if path == "" {
 			newPath = key
@@ -160,12 +160,12 @@ func encodeMessage(msgDescriptor protoreflect.MessageDescriptor, value protorefl
 		fd := msgDescriptor.Fields()
 		v := value.Message().Get(fd.ByName(protoreflect.Name("value")))
 		return fmt.Sprintf("%v", v.Interface()), nil
-	case "google.protobuf.FieldMask":
-		m, ok := value.Message().Interface().(*field_mask.FieldMask)
-		if !ok {
-			return "", nil
-		}
-		return strings.Join(m.Paths, ","), nil
+	// case "google.protobuf.FieldMask":
+	// 	m, ok := value.Message().Interface().(*field_mask.FieldMask)
+	// 	if !ok {
+	// 		return "", nil
+	// 	}
+	// 	return strings.Join(m.Paths, ","), nil
 	default:
 		return "", fmt.Errorf("unsupported message type: %q", string(msgDescriptor.FullName()))
 	}

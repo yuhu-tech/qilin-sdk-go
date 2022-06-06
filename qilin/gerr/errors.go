@@ -7,7 +7,6 @@ import (
 
 	httpstatus "github.com/yuhu-tech/qilin-sdk-go/qilin/gerr/status"
 
-	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/status"
 )
 
@@ -63,7 +62,7 @@ func (e *Error) GRPCStatus() *status.Status {
 		domain = reasonElements[0]
 	}
 	s, _ := status.New(httpstatus.ToGRPCCode(int(e.Code)), e.Message).
-		WithDetails(&errdetails.ErrorInfo{
+		WithDetails(&ErrorInfo{
 			Reason:   e.Reason,
 			Domain:   domain,
 			Metadata: e.Metadata,
@@ -125,7 +124,7 @@ func FromError(err error) *Error {
 		)
 		for _, detail := range gs.Details() {
 			switch d := detail.(type) {
-			case *errdetails.ErrorInfo:
+			case *ErrorInfo:
 				ret.Reason = d.Reason
 				return ret.WithMetadata(d.Metadata)
 			}

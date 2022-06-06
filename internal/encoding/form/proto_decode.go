@@ -10,7 +10,6 @@ import (
 
 	"google.golang.org/protobuf/types/known/structpb"
 
-	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
@@ -283,10 +282,10 @@ func parseMessage(md protoreflect.MessageDescriptor, value string) (protoreflect
 			return protoreflect.Value{}, err
 		}
 		msg = wrapperspb.Bytes(v)
-	case "google.protobuf.FieldMask":
-		fm := &field_mask.FieldMask{}
-		fm.Paths = append(fm.Paths, strings.Split(value, ",")...)
-		msg = fm
+	// case "google.protobuf.FieldMask":
+	// 	fm := &field_mask.FieldMask{}
+	// 	fm.Paths = append(fm.Paths, strings.Split(value, ",")...)
+	// 	msg = fm
 	case "google.protobuf.Value":
 		fm, err := structpb.NewValue(value)
 		if err != nil {
