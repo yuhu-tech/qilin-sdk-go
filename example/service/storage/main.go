@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -18,11 +19,22 @@ const (
 
 func main() {
 	// init client
-	cli, err := storage.NewClient(context.Background(), &storage.Config{AK: Ak, SK: Sk, Endpoint: Endpoint})
+	cli, err := storage.NewClient(context.Background(), &storage.Config{AK: Ak, SK: Sk, TenantId: TestTenant, Endpoint: Endpoint})
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// ========================== mkdir ================================== //
+
+	cfResp, err := cli.CreateFolder(context.Background(), &storage.CreateFolderRequest{
+		FolderName: "test01",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("[CreateFolder] succeed: folder %+v \n", cfResp)
+
+	// ========================== upload files ================================== //
 	// upload files
 	file1, err := os.Open("./1.jpg")
 	if err != nil {
@@ -36,7 +48,7 @@ func main() {
 		[]storage.Files{
 			{FileName: "0.jpg", Data: file1},
 			// {FileName: file2Name, Data: file2},
-		})
+		}, storage.WithFolderId(cfResp.FolderId))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,4 +56,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("[UploadFile] succeed")
+
+	// ========================== download files ================================== //
+
+	// cli.DownloadFile(context.Background(), &storage.DownloadFileRequest{
+	// 	FolderSearchKey: cfResp.FolderDigest,
+	// 	FileName:        "1.jpg",
+	// })
 }
