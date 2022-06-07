@@ -71,7 +71,7 @@ func WithFolderId(folder_id string) Option {
 
 func WithFolderDigest(folder_digest string) Option {
 	return func(ufi *UploadFilesInput) {
-		ufi.folder_id = folder_digest
+		ufi.folder_digest = folder_digest
 	}
 }
 
