@@ -1,0 +1,33 @@
+name: Go
+
+on:
+  push:
+    branches: 
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+
+    strategy:
+      matrix:
+        go_version: [1.16]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{matrix.go_version}}
+
+    - name: go dep
+      run: |
+        export GO111MODULE=on
+        go mod tidy
+        
+    - name: go test
+      run: |
+        go test -v -cover ./...
