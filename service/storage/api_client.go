@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"sort"
@@ -207,7 +206,6 @@ func (r *CreateFolderRequest) Payload() string {
 		b.WriteString("\"" + r.ParentId + "\"")
 	}
 
-	fmt.Println(b.String())
 	return b.String()
 }
 
