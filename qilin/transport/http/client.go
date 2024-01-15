@@ -146,7 +146,7 @@ type Client struct {
 func NewClient(ctx context.Context, opts ...ClientOption) (*Client, error) {
 	options := clientOptions{
 		ctx:          ctx,
-		timeout:      2 * time.Second,
+		timeout:      100 * time.Second,
 		encoder:      DefaultRequestEncoder,
 		decoder:      DefaultResponseDecoder,
 		errorDecoder: DefaultErrorDecoder,
@@ -224,6 +224,7 @@ func (client *Client) Invoke(ctx context.Context, method, path string, args inte
 		if !ok {
 			return errors.New("'PayloadMaker' Interface Must be implemented when authentication is required")
 		}
+		fmt.Println(pMaker.Payload())
 		hs, err := client.opts.auth.GenerateAuthHeader(client.opts.region, pMaker.Payload(), c.operation)
 		if err != nil {
 			return err
