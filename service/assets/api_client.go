@@ -111,7 +111,7 @@ func (c *Client) CreateArtwork(ctx context.Context, in *CreateArtworkRequest, op
 func (c *Client) GetArtworkResult(ctx context.Context, in *GetArtworkResultRequest, opts ...qhttp.CallOption) (*GetArtworkResultResponse, error) {
 	out := new(GetArtworkResultResponse)
 	pattern := "/v1/app/artworks/result"
-	path := "/v1/app/artworks/result"
+	path := fmt.Sprintf("/v1/app/artworks/result?tenant_id=%s&txhash=%s", in.TenantId, in.Txhash)
 
 	opts = append(opts, qhttp.Operation("qilin.api.assets.GetArtworkResult"))
 	opts = append(opts, qhttp.PathTemplate(pattern))
