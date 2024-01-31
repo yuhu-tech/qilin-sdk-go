@@ -31,9 +31,9 @@ type Config struct {
 
 type Signer struct {
 	// 钱包id
-	WalletId string `protobuf:"bytes,1,opt,name=wallet_id,json=walletId,proto3" json:"wallet_id,omitempty"`
+	WalletId string `protobuf:"bytes,1,opt,name=wallet_id,json=walletId,proto3" json:"wallet_id"`
 	// 签名用户id
-	SignedUserId string `protobuf:"bytes,2,opt,name=signed_user_id,json=signedUserId,proto3" json:"signed_user_id,omitempty"`
+	SignedUserId string `protobuf:"bytes,2,opt,name=signed_user_id,json=signedUserId,proto3" json:"signed_user_id"`
 }
 
 type CreateArtworkRequest struct {
