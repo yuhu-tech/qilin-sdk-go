@@ -7,15 +7,14 @@ package wallet
 // import (
 // 	"context"
 // 	"testing"
-
 // )
 
 // const (
 // 	TestTenant = "tid-yuhu1"
 // 	Ak         = "test-ak"
 // 	Sk         = "test-sk"
-// 	// Endpoint   = "119.3.106.151:10100"
-// 	Endpoint = "127.0.0.1:10000"
+// 	Endpoint   = "119.3.106.151:10100"
+// 	// Endpoint = "127.0.0.1:10000"
 // )
 
 // var cli *Client
@@ -39,7 +38,7 @@ package wallet
 // 		TenantId:        "tid-yuhu1",
 // 		ChainInstanceId: "ChainMakerV2CTC",
 // 	})
-// 	t.Log(err==ErrDuplicateWallet)
+// 	t.Log(err == ErrDuplicateWallet)
 // 	if err != nil {
 // 		t.Error(err)
 // 	}
@@ -48,11 +47,11 @@ package wallet
 
 // func TestClient_GetWallet(t *testing.T) {
 // 	getWalletResponse, err := cli.GetWallet(ctx, &GetWalletRequest{
-// 		OutUserId:       "cl11xbqem6md90764cnm3vs2u-",
+// 		OutUserId:       "cl11xbqem6md90764cnm3vs2u",
 // 		ChainInstanceId: "ChainMakerV2CTC",
 // 		TenantId:        "tid-yuhu1",
 // 	})
-// 	t.Log(err==ErrNotFoundWallet)
+// 	t.Log(err == ErrNotFoundWallet)
 // 	if err != nil {
 // 		t.Error(err)
 // 	}

@@ -10,23 +10,70 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/yuhu-tech/qilin-sdk-go/qilin/transport/http"
 	qhttp "github.com/yuhu-tech/qilin-sdk-go/qilin/transport/http"
 )
 
 const ServiceName = "assets"
 const ServiceAPIVersion = "2024-01-15"
 
-type Client struct {
-	cc       *qhttp.Client
-	tenantId string
+var (
+	_ http.PayloadMaker = (*CreateArtworkRequest)(nil)
+	_ http.PayloadMaker = (*GetArtworkResultRequest)(nil)
+	_ http.PayloadMaker = (*GetMintNFTResultRequest)(nil)
+	_ http.PayloadMaker = (*GetTransferNFTResultRequest)(nil)
+	_ http.PayloadMaker = (*MintNFTRequest)(nil)
+	_ http.PayloadMaker = (*TransferNFTRequest)(nil)
+	_ http.PayloadMaker = (*GetBatchTransferNFTResultRequest)(nil)
+	_ http.PayloadMaker = (*BatchTransferNFTRequest)(nil)
+)
+var _ AssetsServiceClient = (*Client)(nil)
+
+type AssetsServiceClient interface {
+	CreateArtwork(ctx context.Context, in *CreateArtworkRequest, opts ...qhttp.CallOption) (*CreateArtworkResponse, error)
+	MintNFT(ctx context.Context, in *MintNFTRequest, opts ...qhttp.CallOption) (*MintNFTResponse, error)
+	TransferNFT(ctx context.Context, in *TransferNFTRequest, opts ...qhttp.CallOption) (*TransferNFTResponse, error)
+	GetArtworkResult(ctx context.Context, in *GetArtworkResultRequest, opts ...qhttp.CallOption) (*GetArtworkResultResponse, error)
+	GetMintNFTResult(ctx context.Context, in *GetMintNFTResultRequest, opts ...qhttp.CallOption) (*GetMintNFTResultResponse, error)
+	GetTransferNFTResult(ctx context.Context, in *GetTransferNFTResultRequest, opts ...qhttp.CallOption) (*GetTransferNFTResultResponse, error)
+	GetBatchTransferNFTResult(ctx context.Context, in *GetBatchTransferNFTResultRequest, opts ...qhttp.CallOption) (*GetBatchTransferNFTResultResponse, error)
+	BatchTransferNFT(ctx context.Context, in *BatchTransferNFTRequest, opts ...qhttp.CallOption) (*BatchTransferNFTResponse, error)
+}
+type BatchTransferNFTRequest struct {
+	// 新所有者
+	ReceiverAddress string `protobuf:"bytes,1,opt,name=receiver_address,json=receiverAddress,proto3" json:"receiver_address,omitempty"`
+	// 合约地址
+	ContractAddress string `protobuf:"bytes,2,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+	// 数量
+	Amount uint64 `protobuf:"bytes,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	// 签名者
+	Signer *Signer `protobuf:"bytes,4,opt,name=signer,proto3" json:"signer,omitempty"`
+	// 租户id
+	TenantId string `protobuf:"bytes,6,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	// 请求id
+	RequestId string `protobuf:"bytes,7,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
 }
 
-type Config struct {
-	AK string
-	SK string
+// Payload implements http.PayloadMaker.
+func (r *BatchTransferNFTRequest) Payload() string {
+	b := strings.Builder{}
+	s1 := fmt.Sprintf("receiver_address=\"%s\"", r.ReceiverAddress)
+	s2 := fmt.Sprintf("contract_address=\"%s\"", r.ContractAddress)
+	s3 := fmt.Sprintf("amount=%d", r.Amount)
+	s4 := fmt.Sprintf("tenant_id=\"%s\"", r.TenantId)
+	s5 := fmt.Sprintf("request_id=\"%s\"", r.RequestId)
+	s6 := fmt.Sprintf("signer={\"signed_user_id\":\"%s\",\"wallet_id\":\"%s\"}", r.Signer.SignedUserId, r.Signer.WalletId)
+	s := strings.Join([]string{s3, s2, s1, s5, s6, s4}, "&")
+	b.WriteString(s)
+	return b.String()
 
-	TenantId string
-	Endpoint string
+}
+
+type BatchTransferNFTResponse struct {
+	// 交易哈希
+	Txhash string `protobuf:"bytes,1,opt,name=txhash,proto3" json:"txhash,omitempty"`
+	// 交易状态
+	Status string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
 }
 
 type Signer struct {
@@ -142,6 +189,29 @@ type TransferNFTResponse struct {
 	// 交易状态
 	Status string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
 }
+type GetBatchTransferNFTResultRequest struct {
+	// 交易哈希
+	TxHash string `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
+	// 租户id
+	TenantId string `protobuf:"bytes,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+}
+
+// Payload implements http.PayloadMaker.
+func (r *GetBatchTransferNFTResultRequest) Payload() string {
+	b := strings.Builder{}
+	s1 := fmt.Sprintf("tx_hash=\"%s\"", r.TxHash)
+	s2 := fmt.Sprintf("tenant_id=\"%s\"", r.TenantId)
+	s := strings.Join([]string{s2, s1}, "&")
+	b.WriteString(s)
+	return b.String()
+}
+
+type GetBatchTransferNFTResultResponse struct {
+	// 状态
+	Status string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	// token列表
+	TokenIdList []string `protobuf:"bytes,2,rep,name=token_id_list,json=tokenIdList,proto3" json:"token_id_list,omitempty"`
+}
 
 func (r *CreateArtworkRequest) Payload() string {
 	b := strings.Builder{}
@@ -222,6 +292,48 @@ func NewClient(ctx context.Context, cfg *Config) (*Client, error) {
 		return nil, err
 	}
 	return &Client{cc: c, tenantId: cfg.TenantId}, nil
+}
+
+type Config struct {
+	AK string
+	SK string
+
+	TenantId string
+	Endpoint string
+}
+type Client struct {
+	cc       *qhttp.Client
+	tenantId string
+}
+
+// BatchTransferNFT implements AssetsServiceClient.
+func (c *Client) BatchTransferNFT(ctx context.Context, in *BatchTransferNFTRequest, opts ...qhttp.CallOption) (*BatchTransferNFTResponse, error) {
+	out := new(BatchTransferNFTResponse)
+	pattern := "/v1/app/nfts:batch_transfer"
+	path := "/v1/app/nfts:batch_transfer"
+
+	opts = append(opts, qhttp.Operation("qilin.api.assets.BatchTransferNFT"))
+	opts = append(opts, qhttp.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GetBatchTransferNFTResult implements AssetsServiceClient.
+func (c *Client) GetBatchTransferNFTResult(ctx context.Context, in *GetBatchTransferNFTResultRequest, opts ...qhttp.CallOption) (*GetBatchTransferNFTResultResponse, error) {
+	out := new(GetBatchTransferNFTResultResponse)
+	pattern := "/v1/app/nfts:batch_stransfer/result"
+	path := fmt.Sprintf("/v1/app/nfts:batch_stransfer/result?tx_hash=%s&tenant_id=%s", in.TxHash, in.TenantId)
+
+	opts = append(opts, qhttp.Operation("qilin.api.assets.GetBatchTransferNFTResult"))
+	opts = append(opts, qhttp.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *Client) CreateArtwork(ctx context.Context, in *CreateArtworkRequest, opts ...qhttp.CallOption) (*CreateArtworkResponse, error) {

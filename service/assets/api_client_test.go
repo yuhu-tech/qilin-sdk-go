@@ -5,11 +5,8 @@
 package assets
 
 // import (
-// 	"testing"
-// )
-
-// import (
 // 	"context"
+// 	"testing"
 // )
 
 // const (
@@ -47,7 +44,7 @@ package assets
 // 			// WalletId:     "wid-nZJKYzZ3K55v",
 // 			SignedUserId: "clkbzvx3ahw1d0767id4kjhrb",
 // 		},
-// 		RequestId: "20240221",
+// 		RequestId: "20240308",
 // 	})
 // 	if err != nil {
 // 		t.Error(err)
@@ -68,7 +65,7 @@ package assets
 
 // func TestClient_GetMintNFTResult(t *testing.T) {
 // 	getMintNFTResultResponse, err := cli.GetMintNFTResult(ctx, &GetMintNFTResultRequest{
-// 		TxHash:   "8518e4a79ce346838ab3dc61829ac5d4197a865fb8654e4e84b19eca852d308c",
+// 		TxHash:   "a44ddad075674590a33b65f04e8c78901c50334bf97e4aa1a7dd4546d0c78ced",
 // 		TenantId: "tid-yuhu1",
 // 	})
 // 	if err != nil {
@@ -90,15 +87,15 @@ package assets
 
 // func TestClient_MintNFT(t *testing.T) {
 // 	mintNFTResponse, err := cli.MintNFT(ctx, &MintNFTRequest{
-// 		ContractAddress: "90c2a20fe818736f89f17b8db7933ae40a4d5fe8",
-// 		ReceiverAddress: "538c0edebebf19b4b30680f8d88b8f5fc4bf4993",
+// 		ContractAddress: "09f90e04378166f7b69bd63d7ee772b675e1bc30",
+// 		ReceiverAddress: "0868a3f91d94683060eb29c41970c320e9254cda",
 // 		Signer: &Signer{
 // 			// WalletId:     "",
 // 			SignedUserId: "clkbzvx3ahw1d0767id4kjhrb",
 // 		},
 // 		TenantId:  "tid-yuhu1",
 // 		Amount:    "100",
-// 		RequestId: "202402192",
+// 		RequestId: "20240328",
 // 	})
 // 	if err != nil {
 // 		t.Error(err)
@@ -110,16 +107,44 @@ package assets
 // 	transferNFTResponse, err := cli.TransferNFT(ctx, &TransferNFTRequest{
 // 		ReceiverAddress: "538c0edebebf19b4b30680f8d88b8f5fc4bf4993",
 // 		ContractAddress: "5972275e95921084d75106554de1ab25a7c0459f",
-// 		TokenId:         "100",
+// 		TokenId:         "1",
 // 		Signer: &Signer{
 // 			WalletId:     "wid-YKxpROYVDJKo",
 // 			SignedUserId: "cl11xbqem6md90764cnm3vs2u",
 // 		},
 // 		TenantId:  "tid-yuhu1",
-// 		RequestId: "202402191",
+// 		RequestId: "20240328",
 // 	})
 // 	if err != nil {
 // 		t.Error(err)
 // 	}
 // 	t.Log(transferNFTResponse)
+// }
+
+// func TestClient_GetBatchTransferNFTResult(t *testing.T) {
+// 	getBatchTransferNFTResult, err := cli.GetBatchTransferNFTResult(ctx, &GetBatchTransferNFTResultRequest{
+// 		TxHash:   "42f0203fc7024e73878b8e3f57e659898cdc095bf35e4385aebb2b5e60fefa7a",
+// 		TenantId: "tid-yuhu1",
+// 	})
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+// 	t.Log(getBatchTransferNFTResult)
+// }
+
+// func TestClient_BatchTransferNFT(t *testing.T) {
+// 	batchTransferNFTResponse, err := cli.BatchTransferNFT(ctx, &BatchTransferNFTRequest{
+// 		ReceiverAddress: "538c0edebebf19b4b30680f8d88b8f5fc4bf4993",
+// 		ContractAddress: "4c147d903517bcb76f21aeaf255eb38e20c96018",
+// 		Amount:          2,
+// 		Signer: &Signer{
+// 			SignedUserId: "yuhu1",
+// 		},
+// 		TenantId:  "tid-yuhu1",
+// 		RequestId: "202404024",
+// 	})
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+// 	t.Log(batchTransferNFTResponse)
 // }
