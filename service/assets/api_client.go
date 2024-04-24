@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/yuhu-tech/qilin/pkg/util/stringutil"
+
 	"github.com/yuhu-tech/qilin-sdk-go/qilin/transport/http"
 	qhttp "github.com/yuhu-tech/qilin-sdk-go/qilin/transport/http"
 )
@@ -26,6 +28,8 @@ var (
 	_ http.PayloadMaker = (*TransferNFTRequest)(nil)
 	_ http.PayloadMaker = (*GetBatchTransferNFTResultRequest)(nil)
 	_ http.PayloadMaker = (*BatchTransferNFTRequest)(nil)
+	_ http.PayloadMaker = (*ListWalletNFTHoldingRequest)(nil)
+	_ http.PayloadMaker = (*ListWalletTokenHoldingRequest)(nil)
 )
 var _ AssetsServiceClient = (*Client)(nil)
 
@@ -38,7 +42,104 @@ type AssetsServiceClient interface {
 	GetTransferNFTResult(ctx context.Context, in *GetTransferNFTResultRequest, opts ...qhttp.CallOption) (*GetTransferNFTResultResponse, error)
 	GetBatchTransferNFTResult(ctx context.Context, in *GetBatchTransferNFTResultRequest, opts ...qhttp.CallOption) (*GetBatchTransferNFTResultResponse, error)
 	BatchTransferNFT(ctx context.Context, in *BatchTransferNFTRequest, opts ...qhttp.CallOption) (*BatchTransferNFTResponse, error)
+	ListWalletTokenHolding(ctx context.Context, in *ListWalletTokenHoldingRequest, opts ...qhttp.CallOption) (*ListWalletTokenHoldingResponse, error)
+	ListWalletNFTHolding(ctx context.Context, in *ListWalletNFTHoldingRequest, opts ...qhttp.CallOption) (*ListWalletNFTHoldingResponse, error)
 }
+type ListWalletTokenHoldingRequest struct {
+	// 合约列表
+	ContractAddressList []string `protobuf:"bytes,1,rep,name=contract_address_list,json=contractAddressList,proto3" json:"contract_address_list,omitempty"`
+	// 钱包地址
+	WalletAddress string `protobuf:"bytes,2,opt,name=wallet_address,json=walletAddress,proto3" json:"wallet_address,omitempty"`
+	// 租户id
+	TenantId string `protobuf:"bytes,3,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+}
+
+// Payload implements http.PayloadMaker.
+func (r *ListWalletTokenHoldingRequest) Payload() string {
+	b := strings.Builder{}
+	s1 := fmt.Sprintf("contract_address_list=[%s]", stringutil.StringJoinWithOvercoat("\"", "\"", ",", r.ContractAddressList...))
+	s2 := fmt.Sprintf("wallet_address=\"%s\"", r.WalletAddress)
+	s7 := fmt.Sprintf("tenant_id=\"%s\"", r.TenantId)
+	s := strings.Join([]string{s1, s7, s2}, "&")
+	b.WriteString(s)
+	return b.String()
+}
+
+type ListWalletTokenHoldingResponse_WalletTokenHolding struct {
+	// 合约地址
+	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+	// 数量
+	Num string `protobuf:"bytes,2,opt,name=num,proto3" json:"num,omitempty"`
+}
+
+type ListWalletTokenHoldingResponse struct {
+	// 合约数量列表
+	WalletTokenHoldingList []*ListWalletTokenHoldingResponse_WalletTokenHolding `protobuf:"bytes,1,rep,name=wallet_token_holding_list,json=walletTokenHoldingList,proto3" json:"wallet_token_holding_list,omitempty"`
+}
+
+type ListWalletNFTHoldingRequest struct {
+	// 合约列表
+	ContractAddressList []string `protobuf:"bytes,1,rep,name=contract_address_list,json=contractAddressList,proto3" json:"contract_address_list,omitempty"`
+	// 钱包地址
+	WalletAddress string `protobuf:"bytes,2,opt,name=wallet_address,json=walletAddress,proto3" json:"wallet_address,omitempty"`
+	// 限制
+	Limit uint32 `protobuf:"bytes,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	// 游标
+	Cursor string `protobuf:"bytes,4,opt,name=cursor,proto3" json:"cursor,omitempty"`
+	// 偏移
+	Offset uint32 `protobuf:"bytes,5,opt,name=offset,proto3" json:"offset,omitempty"`
+	// 是否倒序
+	IsReversed bool `protobuf:"bytes,6,opt,name=is_reversed,json=isReversed,proto3" json:"is_reversed,omitempty"`
+	// 租户id
+	TenantId string `protobuf:"bytes,7,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+}
+
+// Payload implements http.PayloadMaker.
+func (r *ListWalletNFTHoldingRequest) Payload() string {
+	b := strings.Builder{}
+	s1 := fmt.Sprintf("contract_address_list=[%s]", stringutil.StringJoinWithOvercoat("\"", "\"", ",", r.ContractAddressList...))
+	s2 := fmt.Sprintf("wallet_address=\"%s\"", r.WalletAddress)
+	s3 := fmt.Sprintf("limit=%d", r.Limit)
+	s4 := fmt.Sprintf("cursor=\"%s\"", r.Cursor)
+	s5 := fmt.Sprintf("offset=%d", r.Offset)
+	s6 := fmt.Sprintf("is_reversed=%t", r.IsReversed)
+	s7 := fmt.Sprintf("tenant_id=\"%s\"", r.TenantId)
+	s := strings.Join([]string{s1, s4, s6, s3, s5, s7, s2}, "&")
+	b.WriteString(s)
+	return b.String()
+}
+
+type ListWalletNFTHoldingResponse struct {
+	// nft列表
+	NftHolding []*ListWalletNFTHoldingResponse_NFT `protobuf:"bytes,1,rep,name=nft_holding,json=nftHolding,proto3" json:"nft_holding,omitempty"`
+	// 总数
+	Count string `protobuf:"bytes,2,opt,name=count,proto3" json:"count,omitempty"`
+	// 是否有下页数
+	HasNextPage bool `protobuf:"bytes,3,opt,name=has_next_page,json=hasNextPage,proto3" json:"has_next_page,omitempty"`
+	// 末尾游标
+	EndCursor string `protobuf:"bytes,4,opt,name=end_cursor,json=endCursor,proto3" json:"end_cursor,omitempty"`
+}
+type ListWalletNFTHoldingResponse_NFT struct {
+	// 艺术家姓名
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// 艺术品名称
+	Symbol string `protobuf:"bytes,2,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	// 艺术品url
+	ArtworkUrl string `protobuf:"bytes,3,opt,name=artwork_url,json=artworkUrl,proto3" json:"artwork_url,omitempty"`
+	// 摘要
+	Digest string `protobuf:"bytes,4,opt,name=digest,proto3" json:"digest,omitempty"`
+	// 最大发行量
+	MaxSupply string `protobuf:"bytes,5,opt,name=max_supply,json=maxSupply,proto3" json:"max_supply,omitempty"`
+	// 合约地址
+	ContractAddress string `protobuf:"bytes,6,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+	// token_id
+	TokenId string `protobuf:"bytes,7,opt,name=token_id,json=tokenId,proto3" json:"token_id,omitempty"`
+	// id
+	BalanceTokenId string `protobuf:"bytes,8,opt,name=balance_token_id,json=balanceTokenId,proto3" json:"balance_token_id,omitempty"`
+	// 交易哈希
+	TxHash string `protobuf:"bytes,5,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
+}
+
 type BatchTransferNFTRequest struct {
 	// 新所有者
 	ReceiverAddress string `protobuf:"bytes,1,opt,name=receiver_address,json=receiverAddress,proto3" json:"receiver_address,omitempty"`
@@ -62,11 +163,21 @@ func (r *BatchTransferNFTRequest) Payload() string {
 	s3 := fmt.Sprintf("amount=%d", r.Amount)
 	s4 := fmt.Sprintf("tenant_id=\"%s\"", r.TenantId)
 	s5 := fmt.Sprintf("request_id=\"%s\"", r.RequestId)
-	s6 := fmt.Sprintf("signer={\"signed_user_id\":\"%s\",\"wallet_id\":\"%s\"}", r.Signer.SignedUserId, r.Signer.WalletId)
+	s6 := signerString(r.Signer)
 	s := strings.Join([]string{s3, s2, s1, s5, s6, s4}, "&")
 	b.WriteString(s)
 	return b.String()
+}
 
+func signerString(signer *Signer) string {
+	lst := make([]string, 0)
+	if signer.SignedUserId != "" {
+		lst = append(lst, fmt.Sprintf("\"signed_user_id\":\"%s\"", signer.SignedUserId))
+	}
+	if signer.WalletId != "" {
+		lst = append(lst, fmt.Sprintf("\"wallet_id\":\"%s\"", signer.WalletId))
+	}
+	return fmt.Sprintf("signer={%s}", strings.Join(lst, ","))
 }
 
 type BatchTransferNFTResponse struct {
@@ -78,9 +189,9 @@ type BatchTransferNFTResponse struct {
 
 type Signer struct {
 	// 钱包id
-	WalletId string `protobuf:"bytes,1,opt,name=wallet_id,json=walletId,proto3" json:"wallet_id"`
+	WalletId string `protobuf:"bytes,1,opt,name=wallet_id,json=walletId,proto3" json:"wallet_id,omitempty"`
 	// 签名用户id
-	SignedUserId string `protobuf:"bytes,2,opt,name=signed_user_id,json=signedUserId,proto3" json:"signed_user_id"`
+	SignedUserId string `protobuf:"bytes,2,opt,name=signed_user_id,json=signedUserId,proto3" json:"signed_user_id,omitempty"`
 }
 
 type CreateArtworkRequest struct {
@@ -222,7 +333,7 @@ func (r *CreateArtworkRequest) Payload() string {
 	s5 := fmt.Sprintf("max_supply=\"%s\"", r.MaxSupply)
 	s6 := fmt.Sprintf("tenant_id=\"%s\"", r.TenantId)
 	s7 := fmt.Sprintf("request_id=\"%s\"", r.RequestId)
-	s8 := fmt.Sprintf("signer={\"signed_user_id\":\"%s\",\"wallet_id\":\"%s\"}", r.Signer.SignedUserId, r.Signer.WalletId)
+	s8 := signerString(r.Signer)
 	s := strings.Join([]string{s3, s4, s5, s1, s7, s8, s2, s6}, "&")
 	b.WriteString(s)
 	return b.String()
@@ -262,7 +373,7 @@ func (r *MintNFTRequest) Payload() string {
 	s3 := fmt.Sprintf("amount=\"%s\"", r.Amount)
 	s4 := fmt.Sprintf("tenant_id=\"%s\"", r.TenantId)
 	s5 := fmt.Sprintf("request_id=\"%s\"", r.RequestId)
-	s6 := fmt.Sprintf("signer={\"signed_user_id\":\"%s\",\"wallet_id\":\"%s\"}", r.Signer.SignedUserId, r.Signer.WalletId)
+	s6 := signerString(r.Signer)
 	s := strings.Join([]string{s3, s2, s1, s5, s6, s4}, "&")
 	b.WriteString(s)
 	return b.String()
@@ -274,7 +385,7 @@ func (r *TransferNFTRequest) Payload() string {
 	s3 := fmt.Sprintf("token_id=\"%s\"", r.TokenId)
 	s4 := fmt.Sprintf("tenant_id=\"%s\"", r.TenantId)
 	s5 := fmt.Sprintf("request_id=\"%s\"", r.RequestId)
-	s6 := fmt.Sprintf("signer={\"signed_user_id\":\"%s\",\"wallet_id\":\"%s\"}", r.Signer.SignedUserId, r.Signer.WalletId)
+	s6 := signerString(r.Signer)
 	s := strings.Join([]string{s2, s1, s5, s6, s4, s3}, "&")
 	b.WriteString(s)
 	return b.String()
@@ -304,6 +415,40 @@ type Config struct {
 type Client struct {
 	cc       *qhttp.Client
 	tenantId string
+}
+
+// ListWalletNFTHolding implements AssetsServiceClient.
+func (c *Client) ListWalletNFTHolding(ctx context.Context, in *ListWalletNFTHoldingRequest, opts ...qhttp.CallOption) (*ListWalletNFTHoldingResponse, error) {
+	out := new(ListWalletNFTHoldingResponse)
+	pattern := "/v1/app/nfts"
+	path := fmt.Sprintf("/v1/app/nfts?%s&wallet_address=%s&limit=%d&cursor=%s&offset=%d&is_reversed=%t&tenant_id=%s",
+		stringutil.StringJoinWithOvercoat("contract_address_list=", "", "&", in.ContractAddressList...),
+		in.WalletAddress, in.Limit, in.Cursor, in.Offset, in.IsReversed, in.TenantId)
+
+	opts = append(opts, qhttp.Operation("qilin.api.assets.ListWalletNFTHolding"))
+	opts = append(opts, qhttp.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ListWalletTokenHolding implements AssetsServiceClient.
+func (c *Client) ListWalletTokenHolding(ctx context.Context, in *ListWalletTokenHoldingRequest, opts ...qhttp.CallOption) (*ListWalletTokenHoldingResponse, error) {
+	out := new(ListWalletTokenHoldingResponse)
+	pattern := "/v1/app/nfts"
+	path := fmt.Sprintf("/v1/app/nfts/num?%s&wallet_address=%s&tenant_id=%s",
+		stringutil.StringJoinWithOvercoat("contract_address_list=", "", "&", in.ContractAddressList...),
+		in.WalletAddress, in.TenantId)
+
+	opts = append(opts, qhttp.Operation("qilin.api.assets.ListWalletNFTHolding"))
+	opts = append(opts, qhttp.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 // BatchTransferNFT implements AssetsServiceClient.

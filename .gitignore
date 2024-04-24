@@ -1,0 +1,8 @@
+*.exe
+.DS_Store
+go.sum
+qilin-*
+
+.vscode/
+.prettierrc
+.idea/

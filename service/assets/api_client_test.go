@@ -14,7 +14,7 @@ package assets
 // 	Ak         = "test-ak"
 // 	Sk         = "test-sk"
 // 	Endpoint   = "119.3.106.151:10100"
-// 	//Endpoint = "127.0.0.1:20000"
+// 	// Endpoint = "127.0.0.1:10000"
 // )
 
 // var cli *Client
@@ -123,7 +123,7 @@ package assets
 
 // func TestClient_GetBatchTransferNFTResult(t *testing.T) {
 // 	getBatchTransferNFTResult, err := cli.GetBatchTransferNFTResult(ctx, &GetBatchTransferNFTResultRequest{
-// 		TxHash:   "42f0203fc7024e73878b8e3f57e659898cdc095bf35e4385aebb2b5e60fefa7a",
+// 		TxHash:   "792ef4ece5234526849d1e9249d3cb1538aaae0e95c44dc6b6651ad86bf0111e",
 // 		TenantId: "tid-yuhu1",
 // 	})
 // 	if err != nil {
@@ -141,10 +141,40 @@ package assets
 // 			SignedUserId: "yuhu1",
 // 		},
 // 		TenantId:  "tid-yuhu1",
-// 		RequestId: "202404024",
+// 		RequestId: "202404031",
 // 	})
 // 	if err != nil {
 // 		t.Error(err)
 // 	}
 // 	t.Log(batchTransferNFTResponse)
+// }
+
+// func TestClient_ListWalletNFTHolding(t *testing.T) {
+// 	res, err := cli.ListWalletNFTHolding(ctx, &ListWalletNFTHoldingRequest{
+// 		ContractAddressList: []string{"74a55fb59f51faba6fdc8ac94e1706680cb7b622", "159014b2d449396ba7d1178678cea3076f7dec2c"},
+// 		WalletAddress:       "0x7dbd5d3efb0c583257167b1efd58af562053b16c",
+// 		Limit:               100,
+// 		Cursor:              "",
+// 		Offset:              0,
+// 		IsReversed:          false,
+// 		TenantId:            "tid-yuhu1",
+// 	})
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+// 	t.Logf("%+v", res)
+// }
+
+// func TestClient_ListWalletTokenHolding(t *testing.T) {
+// 	res, err := cli.ListWalletTokenHolding(ctx, &ListWalletTokenHoldingRequest{
+// 		ContractAddressList: []string{"74a55fb59f51faba6fdc8ac94e1706680cb7b622", "159014b2d449396ba7d1178678cea3076f7dec2c"},
+// 		WalletAddress:       "0x7dbd5d3efb0c583257167b1efd58af562053b16c",
+// 		TenantId:            "tid-yuhu1",
+// 	})
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+// 	for _, ele := range res.WalletTokenHoldingList {
+// 		t.Log(ele)
+// 	}
 // }
