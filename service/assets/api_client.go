@@ -8,10 +8,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 
-	"github.com/yuhu-tech/qilin/pkg/util/stringutil"
-
+	"github.com/yuhu-tech/qilin-sdk-go/pkg/util/stringutil"
 	"github.com/yuhu-tech/qilin-sdk-go/qilin/transport/http"
 	qhttp "github.com/yuhu-tech/qilin-sdk-go/qilin/transport/http"
 )
@@ -30,6 +30,12 @@ var (
 	_ http.PayloadMaker = (*BatchTransferNFTRequest)(nil)
 	_ http.PayloadMaker = (*ListWalletNFTHoldingRequest)(nil)
 	_ http.PayloadMaker = (*ListWalletTokenHoldingRequest)(nil)
+	_ http.PayloadMaker = (*CreateDigitalIPRequest)(nil)
+	_ http.PayloadMaker = (*SetDigitalIPBaseURIRequest)(nil)
+	_ http.PayloadMaker = (*GetDigitalIPInfoRequest)(nil)
+	_ http.PayloadMaker = (*GetDigitalIPNFTInfoRequest)(nil)
+	_ http.PayloadMaker = (*GetArtworkInfoRequest)(nil)
+	_ http.PayloadMaker = (*GetArtworkNFTInfoRequest)(nil)
 )
 var _ AssetsServiceClient = (*Client)(nil)
 
@@ -44,7 +50,224 @@ type AssetsServiceClient interface {
 	BatchTransferNFT(ctx context.Context, in *BatchTransferNFTRequest, opts ...qhttp.CallOption) (*BatchTransferNFTResponse, error)
 	ListWalletTokenHolding(ctx context.Context, in *ListWalletTokenHoldingRequest, opts ...qhttp.CallOption) (*ListWalletTokenHoldingResponse, error)
 	ListWalletNFTHolding(ctx context.Context, in *ListWalletNFTHoldingRequest, opts ...qhttp.CallOption) (*ListWalletNFTHoldingResponse, error)
+	CreateDigitalIP(ctx context.Context, in *CreateDigitalIPRequest, opts ...qhttp.CallOption) (*CreateDigitalIPResponse, error)
+	SetDigitalIPBaseURI(ctx context.Context, in *SetDigitalIPBaseURIRequest, opts ...qhttp.CallOption) (*SetDigitalIPBaseURIResponse, error)
+	GetDigitalIPInfo(ctx context.Context, in *GetDigitalIPInfoRequest, opts ...qhttp.CallOption) (*GetDigitalIPInfoResponse, error)
+	GetDigitalIPNFTInfo(ctx context.Context, in *GetDigitalIPNFTInfoRequest, opts ...qhttp.CallOption) (*GetDigitalIPNFTInfoResponse, error)
+	GetArtworkInfo(ctx context.Context, in *GetArtworkInfoRequest, opts ...qhttp.CallOption) (*GetArtworkInfoResponse, error)
+	GetArtworkNFTInfo(ctx context.Context, in *GetArtworkNFTInfoRequest, opts ...qhttp.CallOption) (*GetArtworkNFTInfoResponse, error)
 }
+type GetArtworkNFTInfoRequest struct {
+
+	// 合约地址
+	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+	// token id
+	TokenId string `protobuf:"bytes,2,opt,name=token_id,json=tokenId,proto3" json:"token_id,omitempty"`
+	// 租户id
+	TenantId string `protobuf:"bytes,3,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+}
+
+// Payload implements http.PayloadMaker.
+func (r *GetArtworkNFTInfoRequest) Payload() string {
+	arr := []string{
+		fmt.Sprintf("contract_address=\"%s\"", r.ContractAddress),
+		fmt.Sprintf("tenant_id=\"%s\"", r.TenantId),
+		fmt.Sprintf("token_id=\"%s\"", r.TokenId),
+	}
+	sort.Slice(arr, func(i, j int) bool {
+		return arr[i][0] < arr[j][0]
+	})
+	b := strings.Builder{}
+	b.WriteString(strings.Join(arr, "&"))
+	return b.String()
+}
+
+type GetArtworkNFTInfoResponse struct {
+
+	// owner拥有者
+	Owner string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
+}
+
+type GetArtworkInfoRequest struct {
+
+	// 合约地址
+	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+	// 租户id
+	TenantId string `protobuf:"bytes,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+}
+
+// Payload implements http.PayloadMaker.
+func (r *GetArtworkInfoRequest) Payload() string {
+	arr := []string{
+		fmt.Sprintf("contract_address=\"%s\"", r.ContractAddress),
+		fmt.Sprintf("tenant_id=\"%s\"", r.TenantId),
+	}
+	sort.Slice(arr, func(i, j int) bool {
+		return arr[i][0] < arr[j][0]
+	})
+	b := strings.Builder{}
+	b.WriteString(strings.Join(arr, "&"))
+	return b.String()
+}
+
+type GetArtworkInfoResponse struct {
+
+	// 艺术家姓名
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// 艺术品名称
+	Symbol string `protobuf:"bytes,2,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	// 艺术品url
+	ArtworkUrl string `protobuf:"bytes,3,opt,name=artwork_url,json=artworkUrl,proto3" json:"artwork_url,omitempty"`
+	// 摘要
+	Digest string `protobuf:"bytes,4,opt,name=digest,proto3" json:"digest,omitempty"`
+	// 最大发行量
+	MaxSupply string `protobuf:"bytes,5,opt,name=max_supply,json=maxSupply,proto3" json:"max_supply,omitempty"`
+	// 合约地址
+	ContractAddress string `protobuf:"bytes,6,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+}
+
+type GetDigitalIPNFTInfoRequest struct {
+
+	// 合约地址
+	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+	// token id
+	TokenId string `protobuf:"bytes,2,opt,name=token_id,json=tokenId,proto3" json:"token_id,omitempty"`
+	// 租户id
+	TenantId string `protobuf:"bytes,3,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+}
+
+// Payload implements http.PayloadMaker.
+func (r *GetDigitalIPNFTInfoRequest) Payload() string {
+	arr := []string{
+		fmt.Sprintf("contract_address=\"%s\"", r.ContractAddress),
+		fmt.Sprintf("tenant_id=\"%s\"", r.TenantId),
+		fmt.Sprintf("token_id=\"%s\"", r.TokenId),
+	}
+	sort.Slice(arr, func(i, j int) bool {
+		return arr[i][0] < arr[j][0]
+	})
+	b := strings.Builder{}
+	b.WriteString(strings.Join(arr, "&"))
+	return b.String()
+}
+
+type GetDigitalIPNFTInfoResponse struct {
+
+	// owner拥有者
+	Owner string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
+	// token uri
+	TokenUri string `protobuf:"bytes,2,opt,name=token_uri,json=tokenUri,proto3" json:"token_uri,omitempty"`
+}
+
+type GetDigitalIPInfoRequest struct {
+
+	// 合约地址
+	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+	// 租户id
+	TenantId string `protobuf:"bytes,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+}
+
+// Payload implements http.PayloadMaker.
+func (r *GetDigitalIPInfoRequest) Payload() string {
+	arr := []string{
+		fmt.Sprintf("contract_address=\"%s\"", r.ContractAddress),
+		fmt.Sprintf("tenant_id=\"%s\"", r.TenantId),
+	}
+	sort.Slice(arr, func(i, j int) bool {
+		return arr[i][0] < arr[j][0]
+	})
+	b := strings.Builder{}
+	b.WriteString(strings.Join(arr, "&"))
+	return b.String()
+}
+
+type GetDigitalIPInfoResponse struct {
+
+	// 艺术家姓名
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// 艺术品名称
+	Symbol string `protobuf:"bytes,2,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	// 最大发行量
+	MaxSupply string `protobuf:"bytes,5,opt,name=max_supply,json=maxSupply,proto3" json:"max_supply,omitempty"`
+	// 合约地址
+	ContractAddress string `protobuf:"bytes,6,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+	// base uri
+	BaseUri string `protobuf:"bytes,7,opt,name=base_uri,json=baseUri,proto3" json:"base_uri,omitempty"`
+}
+
+type SetDigitalIPBaseURIRequest struct {
+	// 合约地址
+	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+	// base uri
+	BaseUri string `protobuf:"bytes,2,opt,name=base_uri,json=baseUri,proto3" json:"base_uri,omitempty"`
+	// 租户id
+	TenantId string `protobuf:"bytes,3,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	// 请求id
+	RequestId string `protobuf:"bytes,4,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	// 签名者
+	Signer *Signer `protobuf:"bytes,5,opt,name=signer,proto3" json:"signer,omitempty"`
+}
+
+// Payload implements http.PayloadMaker.
+func (r *SetDigitalIPBaseURIRequest) Payload() string {
+	arr := []string{
+		signerString(r.Signer),
+		fmt.Sprintf("tenant_id=\"%s\"", r.TenantId),
+		fmt.Sprintf("request_id=\"%s\"", r.RequestId),
+		fmt.Sprintf("contract_address=\"%s\"", r.ContractAddress),
+		fmt.Sprintf("base_uri=\"%s\"", r.BaseUri),
+	}
+	sort.Slice(arr, func(i, j int) bool {
+		return arr[i][0] < arr[j][0]
+	})
+	b := strings.Builder{}
+	b.WriteString(strings.Join(arr, "&"))
+	return b.String()
+}
+
+type SetDigitalIPBaseURIResponse struct {
+	// 交易哈希
+	TxHash string `protobuf:"bytes,2,opt,name=txHash,proto3" json:"txHash,omitempty"`
+	// 交易状态
+	Status string `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+}
+type CreateDigitalIPRequest struct {
+	// 作者名称
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// 藏品名称
+	Symbol string `protobuf:"bytes,2,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	// 藏品最大铸造量
+	MaxSupply string `protobuf:"bytes,3,opt,name=max_supply,json=maxSupply,proto3" json:"max_supply,omitempty"`
+	// 签名者
+	Signer *Signer `protobuf:"bytes,4,opt,name=signer,proto3" json:"signer,omitempty"`
+	// 租户id
+	TenantId string `protobuf:"bytes,5,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	// 请求id
+	RequestId string `protobuf:"bytes,6,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+}
+
+func (r *CreateDigitalIPRequest) Payload() string {
+	arr := []string{
+		fmt.Sprintf("max_supply=\"%s\"", r.MaxSupply),
+		fmt.Sprintf("name=\"%s\"", r.Name),
+		fmt.Sprintf("request_id=\"%s\"", r.RequestId),
+		signerString(r.Signer),
+		fmt.Sprintf("symbol=\"%s\"", r.Symbol),
+		fmt.Sprintf("tenant_id=\"%s\"", r.TenantId),
+	}
+	sort.Slice(arr, func(i, j int) bool {
+		return arr[i][0] < arr[j][0]
+	})
+	b := strings.Builder{}
+	b.WriteString(strings.Join(arr, "&"))
+	return b.String()
+}
+
+type CreateDigitalIPResponse struct {
+	// 合约地址
+	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+}
+
 type ListWalletTokenHoldingRequest struct {
 	// 合约列表
 	ContractAddressList []string `protobuf:"bytes,1,rep,name=contract_address_list,json=contractAddressList,proto3" json:"contract_address_list,omitempty"`
@@ -415,6 +638,96 @@ type Config struct {
 type Client struct {
 	cc       *qhttp.Client
 	tenantId string
+}
+
+// GetArtworkNFTInfo implements AssetsServiceClient.
+func (c *Client) GetArtworkNFTInfo(ctx context.Context, in *GetArtworkNFTInfoRequest, opts ...qhttp.CallOption) (*GetArtworkNFTInfoResponse, error) {
+	out := new(GetArtworkNFTInfoResponse)
+	pattern := "/v1/app/artworks/nft_info"
+	path := fmt.Sprintf("/v1/app/artworks/nft_info?contract_address=%s&token_id=%s&tenant_id=%s", in.ContractAddress, in.TokenId, in.TenantId)
+
+	opts = append(opts, qhttp.Operation("qilin.api.assets.GetArtworkNFTInfo"))
+	opts = append(opts, qhttp.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GetArtworkInfo implements AssetsServiceClient.
+func (c *Client) GetArtworkInfo(ctx context.Context, in *GetArtworkInfoRequest, opts ...qhttp.CallOption) (*GetArtworkInfoResponse, error) {
+	out := new(GetArtworkInfoResponse)
+	pattern := "/v1/app/artworks/info"
+	path := fmt.Sprintf("/v1/app/artworks/info?contract_address=%s&tenant_id=%s", in.ContractAddress, in.TenantId)
+
+	opts = append(opts, qhttp.Operation("qilin.api.assets.GetArtworkInfo"))
+	opts = append(opts, qhttp.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GetDigitalIPNFTInfo implements AssetsServiceClient.
+func (c *Client) GetDigitalIPNFTInfo(ctx context.Context, in *GetDigitalIPNFTInfoRequest, opts ...qhttp.CallOption) (*GetDigitalIPNFTInfoResponse, error) {
+	out := new(GetDigitalIPNFTInfoResponse)
+	pattern := "/v1/app/digital_ips/nft_info"
+	path := fmt.Sprintf("/v1/app/digital_ips/nft_info?contract_address=%s&token_id=%s&tenant_id=%s", in.ContractAddress, in.TokenId, in.TenantId)
+
+	opts = append(opts, qhttp.Operation("qilin.api.assets.GetDigitalIPNFTInfo"))
+	opts = append(opts, qhttp.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GetDigitalIPInfo implements AssetsServiceClient.
+func (c *Client) GetDigitalIPInfo(ctx context.Context, in *GetDigitalIPInfoRequest, opts ...qhttp.CallOption) (*GetDigitalIPInfoResponse, error) {
+	out := new(GetDigitalIPInfoResponse)
+	pattern := "/v1/app/digital_ips/info"
+	path := fmt.Sprintf("/v1/app/digital_ips/info?contract_address=%s&tenant_id=%s", in.ContractAddress, in.TenantId)
+
+	opts = append(opts, qhttp.Operation("qilin.api.assets.GetDigitalIPInfo"))
+	opts = append(opts, qhttp.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// SetDigitalIPBaseURI implements AssetsServiceClient.
+func (c *Client) SetDigitalIPBaseURI(ctx context.Context, in *SetDigitalIPBaseURIRequest, opts ...qhttp.CallOption) (*SetDigitalIPBaseURIResponse, error) {
+	out := new(SetDigitalIPBaseURIResponse)
+	pattern := "/v1/app/digital_ips/base_uri"
+	path := "/v1/app/digital_ips/base_uri"
+
+	opts = append(opts, qhttp.Operation("qilin.api.assets.SetDigitalIPBaseURI"))
+	opts = append(opts, qhttp.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// CreateDigitalIP implements AssetsServiceClient.
+func (c *Client) CreateDigitalIP(ctx context.Context, in *CreateDigitalIPRequest, opts ...qhttp.CallOption) (*CreateDigitalIPResponse, error) {
+	out := new(CreateDigitalIPResponse)
+	pattern := "/v1/app/digital_ips"
+	path := "/v1/app/digital_ips"
+
+	opts = append(opts, qhttp.Operation("qilin.api.assets.CreateDigitalIP"))
+	opts = append(opts, qhttp.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 // ListWalletNFTHolding implements AssetsServiceClient.
