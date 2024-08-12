@@ -15,8 +15,8 @@ package assets
 // 	TestTenant = "tid-yuhu1"
 // 	Ak         = "test-ak"
 // 	Sk         = "test-sk"
-// 	// Endpoint   = "119.3.106.151:10100"
-// 	Endpoint = "127.0.0.1:10000"
+// 	Endpoint   = "122.112.237.200:10100"
+// 	// Endpoint = "127.0.0.1:10000"
 // )
 
 // var cli *Client
@@ -195,7 +195,7 @@ package assets
 // 	if err != nil {
 // 		t.Fatal(err)
 // 	}
-// 	t.Log(res)
+// 	t.Logf("%+v", res)
 // }
 
 // func TestClient_SetDigitalIPBaseURI(t *testing.T) {

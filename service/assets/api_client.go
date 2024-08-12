@@ -266,6 +266,10 @@ func (r *CreateDigitalIPRequest) Payload() string {
 type CreateDigitalIPResponse struct {
 	// 合约地址
 	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+	// 交易哈希
+	Txhash string `protobuf:"bytes,2,opt,name=txhash,proto3" json:"txhash,omitempty"`
+	// 交易状态
+	Status string `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
 }
 
 type ListWalletTokenHoldingRequest struct {
