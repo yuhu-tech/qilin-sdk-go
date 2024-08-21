@@ -49,7 +49,7 @@ package assets
 // 		Signer: &Signer{
 // 			SignedUserId: "zwz2024061801",
 // 		},
-// 		RequestId: "2024072301",
+// 		RequestId: "20240723011",
 // 	})
 // 	if err != nil {
 // 		t.Fatal(err)
@@ -129,7 +129,7 @@ package assets
 // 		TenantId: "tid-yuhu1",
 // 	})
 // 	if err != nil {
-// 		t.Error(err)
+// 		t.Fatal(err)
 // 	}
 // 	t.Log(getBatchTransferNFTResult)
 // }
@@ -170,8 +170,8 @@ package assets
 
 // func TestClient_ListWalletTokenHolding(t *testing.T) {
 // 	res, err := cli.ListWalletTokenHolding(ctx, &ListWalletTokenHoldingRequest{
-// 		ContractAddressList: []string{"09f90e04378166f7b69bd63d7ee772b675e1bc30"},
-// 		WalletAddress:       "cb393a59cfcae34f6cfd9c629fe122d93a3041d1",
+// 		ContractAddressList: []string{"2e5b960dac76291830b77753b3d3afe2808a85e0"},
+// 		WalletAddress:       "d7046b6bf65ab2f3c37470d9e07b96ae34bfcc27",
 // 		TenantId:            "tid-yuhu1",
 // 	})
 // 	if err != nil {
@@ -185,12 +185,12 @@ package assets
 
 // func TestClient_CreateDigitalIP(t *testing.T) {
 // 	res, err := cli.CreateDigitalIP(ctx, &CreateDigitalIPRequest{
-// 		Name:      "name1",
-// 		Symbol:    "symbol1",
-// 		MaxSupply: "100",
-// 		Signer:    &Signer{WalletId: "wid-rLJynMvP6K03", SignedUserId: "test-user1"},
+// 		Name:      "朗斯国际",
+// 		Symbol:    "测试-8-21",
+// 		MaxSupply: "12345",
+// 		Signer:    &Signer{SignedUserId: "cl11xbqem6md90764cnm3vs2u"},
 // 		TenantId:  TestTenant,
-// 		RequestId: "201408061",
+// 		RequestId: "526805886241341449",
 // 	})
 // 	if err != nil {
 // 		t.Fatal(err)

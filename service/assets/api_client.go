@@ -786,8 +786,8 @@ func (c *Client) BatchTransferNFT(ctx context.Context, in *BatchTransferNFTReque
 // GetBatchTransferNFTResult implements AssetsServiceClient.
 func (c *Client) GetBatchTransferNFTResult(ctx context.Context, in *GetBatchTransferNFTResultRequest, opts ...qhttp.CallOption) (*GetBatchTransferNFTResultResponse, error) {
 	out := new(GetBatchTransferNFTResultResponse)
-	pattern := "/v1/app/nfts:batch_stransfer/result"
-	path := fmt.Sprintf("/v1/app/nfts:batch_stransfer/result?tx_hash=%s&tenant_id=%s", in.TxHash, in.TenantId)
+	pattern := "/v1/app/nfts:batch_transfer/result"
+	path := fmt.Sprintf("/v1/app/nfts:batch_transfer/result?tx_hash=%s&tenant_id=%s", in.TxHash, in.TenantId)
 
 	opts = append(opts, qhttp.Operation("qilin.api.assets.GetBatchTransferNFTResult"))
 	opts = append(opts, qhttp.PathTemplate(pattern))
