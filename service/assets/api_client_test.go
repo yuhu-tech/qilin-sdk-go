@@ -15,8 +15,8 @@ package assets
 // 	TestTenant = "tid-yuhu1"
 // 	Ak         = "test-ak"
 // 	Sk         = "test-sk"
-// 	Endpoint   = "122.112.237.200:10100"
-// 	// Endpoint = "127.0.0.1:10000"
+// 	// Endpoint   = "122.112.237.200:10100"
+// 	Endpoint = "127.0.0.1:10000"
 // )
 
 // var cli *Client
@@ -256,4 +256,17 @@ package assets
 // 		t.Fatal(err)
 // 	}
 // 	t.Logf("%+v", res)
+// }
+
+// func TestClient_ListNFTHoldingInfo(t *testing.T) {
+// 	res, err := cli.ListNFTHoldingInfo(ctx, &ListNFTHoldingInfoRequest{
+// 		ContractAddress: "74a55fb59f51faba6fdc8ac94e1706680cb7b622",
+// 		TenantId:        TestTenant,
+// 	})
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	for _, v := range res.NftHoldingInfoList {
+// 		t.Logf("%+v", v)
+// 	}
 // }
