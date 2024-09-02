@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/yuhu-tech/qilin-sdk-go/pkg/util/stringutil"
 	"github.com/yuhu-tech/qilin-sdk-go/qilin/transport/http"
 	qhttp "github.com/yuhu-tech/qilin-sdk-go/qilin/transport/http"
@@ -204,6 +205,14 @@ type GetDigitalIPNFTInfoResponse struct {
 	Owner string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
 	// token uri
 	TokenUri string `protobuf:"bytes,2,opt,name=token_uri,json=tokenUri,proto3" json:"token_uri,omitempty"`
+	// 交易哈希
+	Txhash string `protobuf:"bytes,3,opt,name=txhash,proto3" json:"txhash,omitempty"`
+	// 交易时间
+	TxTime *timestamp.Timestamp `protobuf:"bytes,4,opt,name=tx_time,json=txTime,proto3" json:"tx_time,omitempty"`
+	// 名称
+	Name string `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
+	// 图片
+	Image string `protobuf:"bytes,6,opt,name=image,proto3" json:"image,omitempty"`
 }
 
 type GetDigitalIPInfoRequest struct {
