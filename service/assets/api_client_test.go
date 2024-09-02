@@ -262,6 +262,9 @@ package assets
 // 	res, err := cli.ListNFTHoldingInfo(ctx, &ListNFTHoldingInfoRequest{
 // 		ContractAddress: "74a55fb59f51faba6fdc8ac94e1706680cb7b622",
 // 		TenantId:        TestTenant,
+// 		WalletAddress:   "0x7dbd5d3efb0c583257167b1efd58af562053b16c",
+// 		Limit:           10,
+// 		// Offset: 0,
 // 	})
 // 	if err != nil {
 // 		t.Fatal(err)
@@ -269,4 +272,5 @@ package assets
 // 	for _, v := range res.NftHoldingInfoList {
 // 		t.Logf("%+v", v)
 // 	}
+// 	t.Log(res)
 // }

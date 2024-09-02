@@ -15,7 +15,6 @@ import (
 	"github.com/yuhu-tech/qilin-sdk-go/pkg/util/stringutil"
 	"github.com/yuhu-tech/qilin-sdk-go/qilin/transport/http"
 	qhttp "github.com/yuhu-tech/qilin-sdk-go/qilin/transport/http"
-	"google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const ServiceName = "assets"
@@ -62,14 +61,17 @@ type AssetsServiceClient interface {
 	ListNFTHoldingInfo(ctx context.Context, in *ListNFTHoldingInfoRequest, opts ...qhttp.CallOption) (*ListNFTHoldingInfoResponse, error)
 }
 type ListNFTHoldingInfoRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
 
 	// 合约地址
 	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
 	// 租户id
 	TenantId string `protobuf:"bytes,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	// 钱包地址
+	WalletAddress string `protobuf:"bytes,3,opt,name=wallet_address,json=walletAddress,proto3" json:"wallet_address,omitempty"`
+	// limit
+	Limit uint32 `protobuf:"bytes,4,opt,name=limit,proto3" json:"limit,omitempty"`
+	// offset
+	Offset uint32 `protobuf:"bytes,5,opt,name=offset,proto3" json:"offset,omitempty"`
 }
 
 // Payload implements http.PayloadMaker.
@@ -77,6 +79,9 @@ func (r *ListNFTHoldingInfoRequest) Payload() string {
 	arr := []string{
 		fmt.Sprintf(`contract_address="%s"`, r.ContractAddress),
 		fmt.Sprintf(`tenant_id="%s"`, r.TenantId),
+		fmt.Sprintf(`limit=%d`, r.Limit),
+		fmt.Sprintf(`offset=%d`, r.Offset),
+		fmt.Sprintf(`wallet_address="%s"`, r.WalletAddress),
 	}
 	sort.Slice(arr, func(i, j int) bool {
 		return arr[i][0] < arr[j][0]
@@ -87,14 +92,7 @@ func (r *ListNFTHoldingInfoRequest) Payload() string {
 }
 
 type ListNFTHoldingInfoResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
 	NftHoldingInfoList []*struct {
-		state         protoimpl.MessageState
-		sizeCache     protoimpl.SizeCache
-		unknownFields protoimpl.UnknownFields
 
 		// 钱包地址
 		WalletAddress string `protobuf:"bytes,1,opt,name=wallet_address,json=walletAddress,proto3" json:"wallet_address,omitempty"`
@@ -103,6 +101,8 @@ type ListNFTHoldingInfoResponse struct {
 		// 比例
 		Rate float32 `protobuf:"bytes,3,opt,name=rate,proto3" json:"rate,omitempty"`
 	} `protobuf:"bytes,1,rep,name=nft_holding_info_list,json=nftHoldingInfoList,proto3" json:"nft_holding_info_list,omitempty"`
+	// 总数
+	Total string `protobuf:"bytes,2,opt,name=total,proto3" json:"total,omitempty"`
 }
 
 type GetArtworkNFTInfoRequest struct {
@@ -704,7 +704,7 @@ type Client struct {
 func (c *Client) ListNFTHoldingInfo(ctx context.Context, in *ListNFTHoldingInfoRequest, opts ...qhttp.CallOption) (*ListNFTHoldingInfoResponse, error) {
 	out := new(ListNFTHoldingInfoResponse)
 	pattern := "/v1/app/nfts/holding_info"
-	path := fmt.Sprintf("/v1/app/nfts/holding_info?contract_address=%s&tenant_id=%s", in.ContractAddress, in.TenantId)
+	path := fmt.Sprintf("/v1/app/nfts/holding_info?contract_address=%s&tenant_id=%s&limit=%d&offset=%d&wallet_address=%s", in.ContractAddress, in.TenantId, in.Limit, in.Offset, in.WalletAddress)
 
 	opts = append(opts, qhttp.Operation("qilin.api.assets.ListNFTHoldingInfo"))
 	opts = append(opts, qhttp.PathTemplate(pattern))
