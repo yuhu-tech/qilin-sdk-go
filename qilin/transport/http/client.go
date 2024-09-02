@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/yuhu-tech/qilin-sdk-go/internal/encoding"
@@ -224,7 +225,8 @@ func (client *Client) Invoke(ctx context.Context, method, path string, args inte
 		if !ok {
 			return errors.New("'PayloadMaker' Interface Must be implemented when authentication is required")
 		}
-		hs, err := client.opts.auth.GenerateAuthHeader(client.opts.region, pMaker.Payload(), c.operation)
+		// 兼容可选参数
+		hs, err := client.opts.auth.GenerateAuthHeader(client.opts.region, strings.ReplaceAll(pMaker.Payload(), `""`, ""), c.operation)
 		if err != nil {
 			return err
 		}

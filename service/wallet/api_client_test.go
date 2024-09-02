@@ -7,15 +7,17 @@ package wallet
 // import (
 // 	"context"
 // 	"testing"
-
 // )
 
 // const (
-// 	TestTenant = "tid-yuhu1"
-// 	Ak         = "test-ak"
-// 	Sk         = "test-sk"
+// 	// TestTenant = "tid-yuhu1"
+// 	// Ak         = "test-ak"
+// 	// Sk         = "test-sk"
 // 	// Endpoint   = "119.3.106.151:10100"
-// 	Endpoint = "127.0.0.1:10000"
+// 	Endpoint   = "127.0.0.1:10000"
+// 	TestTenant = "tid-GYBmZzoDRGGO"
+// 	Ak         = "YHAKZX6NSQNZLZFTLGT1"
+// 	Sk         = "EIkdOhz1ZDGiTFefS4Fa3cQdIm5NfMASeGOykSe8"
 // )
 
 // var cli *Client
@@ -35,24 +37,24 @@ package wallet
 
 // func TestClient_CreateWallet(t *testing.T) {
 // 	createWalletResponse, err := cli.CreateWallet(ctx, &CreateWalletRequest{
-// 		SignUserId:      "cl11xbqem6md90764cnm3vs2u",
-// 		TenantId:        "tid-yuhu1",
+// 		SignUserId:      "test-user",
+// 		TenantId:        TestTenant,
 // 		ChainInstanceId: "ChainMakerV2CTC",
 // 	})
-// 	t.Log(err==ErrDuplicateWallet)
 // 	if err != nil {
-// 		t.Error(err)
+// 		t.Log(err == ErrDuplicateWallet)
+// 		t.Fatal(err)
 // 	}
 // 	t.Log(createWalletResponse)
 // }
 
 // func TestClient_GetWallet(t *testing.T) {
 // 	getWalletResponse, err := cli.GetWallet(ctx, &GetWalletRequest{
-// 		OutUserId:       "cl11xbqem6md90764cnm3vs2u-",
+// 		OutUserId:       "cl11xbqem6md90764cnm3vs2u",
 // 		ChainInstanceId: "ChainMakerV2CTC",
 // 		TenantId:        "tid-yuhu1",
 // 	})
-// 	t.Log(err==ErrNotFoundWallet)
+// 	t.Log(err == ErrNotFoundWallet)
 // 	if err != nil {
 // 		t.Error(err)
 // 	}
